@@ -34,12 +34,31 @@ export async function createThread({
   }
 }
 
-export async function getThreads(pageNumber = 1, pageSize = 10) {
+export async function getThreads(pageNumber = 1, pageSize = 20) {
   try {
     ConnectDB();
-    const threads = await Thread.find({
+    const skipAmount = pageSize * (pageNumber - 1);
+    const postsQuery = Thread.find({
       parentId: { $in: [null, undefined] },
-    }).sort({ createdAt: "desc" });
+    })
+      .sort({ createdAt: "desc" })
+      .skip(skipAmount)
+      .limit(pageSize)
+      .populate({ path: "author", model: User })
+      .populate({
+        path: "children",
+        populate: {
+          path: "author",
+          model: User,
+          select: "_id name parentId image",
+        },
+      });
+    const totalPostCount = await Thread.countDocuments({
+      parentId: { $in: [null, undefined] },
+    });
+    const posts = await postsQuery.exec();
+    const isNext = totalPostCount > skipAmount + posts.length;
+    return { posts, isNext };
   } catch (err: any) {
     throw new Error(`Error getting threads: ${err.message}`);
   }
