@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import { ConnectDB } from "../mongoose";
+import Thread from "../models/thread.model";
 
 interface Params {
   userId: string;
@@ -57,5 +58,35 @@ export async function getUser(userId: string) {
     // })
   } catch (err: any) {
     throw new Error(`Error getting user: ${err.message}`);
+  }
+}
+
+export async function getUserPost(userId: string) {
+  ConnectDB();
+  try {
+    const threads = await User.findOne({ id: userId }).populate({
+      path: "threads",
+      model: Thread,
+      populate: {
+        path: "children",
+        model: Thread,
+        populate: {
+          path: "author",
+          model: User,
+          select: "name image id",
+        },
+      },
+    });
+    return threads;
+  } catch (err: any) {
+    throw new Error(`Error getting user: ${err.message}`);
+  }
+}
+
+export async function getUsers({}) {
+  try {
+    ConnectDB();
+  } catch (err: any) {
+    throw new Error(`Error getting users: ${err.message}`);
   }
 }

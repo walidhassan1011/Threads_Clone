@@ -116,9 +116,10 @@ const ThreadCard = ({
               {content}
             </p>
             <div
-              className="mt-5 flex flex-col 
+              className={`mt-5 flex flex-col 
                 gap-3
-                "
+                ${isComment && "mb-10"}
+                `}
             >
               <div
                 className="
