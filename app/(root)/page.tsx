@@ -1,10 +1,15 @@
 import ThreadCard from "@/components/cards/ThreadCard";
 import { getThreads } from "@/lib/actions/thread.action";
+import { getUser } from "@/lib/actions/user.action";
 import { currentUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 export default async function Home() {
   const result = await getThreads(1, 30);
-  console.log(result);
+
   const user = await currentUser();
+  if (!user) return null;
+  const userInfo = await getUser(user.id);
+  if (!userInfo.onboarded) redirect("/onboarding");
   return (
     <>
       <h1 className="head-text text-left">Home</h1>

@@ -19,7 +19,17 @@ export default function RootLayout({
             bg-dark-1
         `}
         >
-          {children}
+          <div
+            className="
+            w-full
+            flex flex-col
+            min-h-screen
+            items-center
+            justify-center
+            "
+          >
+            {children}
+          </div>
         </body>
       </html>
     </ClerkProvider>
